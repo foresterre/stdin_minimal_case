@@ -1,0 +1,1 @@
+[rust playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=b7b58267b1b8ee044909ec8865b363f8)
