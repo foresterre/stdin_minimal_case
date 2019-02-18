@@ -1,15 +1,21 @@
 use std::io::stdin;
 use std::io::Read;
 
+// Read bytes (u8) from Stdin.
 fn read_raw_bytes_from_stdin() -> Result<Vec<u8>, String> {
     let mut input: Vec<u8> = Vec::new();
 
-    // If stdin is empty and no input file is defined, the programs waits for input instead of returning the Err(...)
+    // If stdin is empty and no input file is defined, the programs waits* for
+    // input (until EOF byte?) instead of returning the Err(...).
     // The program has to be killed manually.
     //
-    // using stdin().bytes().collect::Vec<u8>() has the same result.
+    // * := (I think/assume)
+    //
+    // using stdin().bytes().collect::Vec<u8>() gives the same result.
     // locking first with stdin().lock() idem.
-    let size = stdin().read_to_end(&mut input).map_err(|e| e.to_string())?;
+    let size = stdin()
+        .read_to_end(&mut input)
+        .map_err(|e| e.to_string())?;
 
     if size == 0 {
         Err("Stdin was empty".to_string())
@@ -21,13 +27,25 @@ fn read_raw_bytes_from_stdin() -> Result<Vec<u8>, String> {
 
 // Succeeds on play.rust-lang.org
 // But hangs on my local PC.
+//
+// Specifically, I would like to display a help page to a user when the stdin is empty
+// on the program start.
+// Since the console seems to allows text input, I think the stdin stream is 'open' when no
+// input is piped to the application (Possibly no EOF byte could be found (?)).
+// If that is true I'm not sure how to close it;
+//
+// One idea is to run read_raw_bytes_from_stdin() in a separate thread with a maximum
+// duration and hope that all data has already been received?
+// Async could work too, but I would prefer to stay on stable.
+//
+//
+//
 #[test]
 fn expect_empty_result() {
     let case = read_raw_bytes_from_stdin();
 
     assert!(case.is_err());
 }
-
 
 fn main() {
     println!("Hello, world!");
