@@ -5,6 +5,12 @@ use std::io::Read;
 fn read_raw_bytes_from_stdin() -> Result<Vec<u8>, String> {
     let mut input: Vec<u8> = Vec::new();
 
+    println!(
+        "If no stdin input was provided, this program will 'hang'. \
+         That is, no termination signal has been received by the program. \
+         To continue, send a termination signal through the console (usually Ctrl+D)."
+    );
+
     // If stdin is empty and no input file is defined, the programs waits* for
     // input (until NUL or some other termination signal byte?) instead of
     // returning Err(...).
@@ -14,9 +20,7 @@ fn read_raw_bytes_from_stdin() -> Result<Vec<u8>, String> {
     //
     // using stdin().bytes().collect::Vec<u8>() gives the same result.
     // locking first with stdin().lock() idem.
-    let size = stdin()
-        .read_to_end(&mut input)
-        .map_err(|e| e.to_string())?;
+    let size = stdin().read_to_end(&mut input).map_err(|e| e.to_string())?;
 
     if size == 0 {
         Err("Stdin was empty".to_string())
@@ -48,6 +52,9 @@ fn expect_empty_result() {
     assert!(case.is_err());
 }
 
-fn main() {
-    println!("Hello, world!");
+fn main() -> Result<(), String> {
+    read_raw_bytes_from_stdin().map(|buffer| {
+        println!("input size (bytes): {}", buffer.len());
+        ()
+    })
 }
