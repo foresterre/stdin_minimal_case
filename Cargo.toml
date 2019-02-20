@@ -5,3 +5,7 @@ authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 edition = "2018"
 
 [dependencies]
+tokio-fs = "0.1.5"
+tokio-io = "0.1.11"
+tokio-threadpool = "0.1.11"
+futures = "0.1.25"
