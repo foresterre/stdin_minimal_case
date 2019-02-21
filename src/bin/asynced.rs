@@ -1,7 +1,6 @@
 use std::io::Read;
 
-use futures::{Future, Stream, Sink};
-
+use futures::{Future, Sink, Stream};
 
 // Probably will want to use tokio-io instead
 fn something() -> Result<(), Box<std::error::Error>> {
@@ -21,10 +20,8 @@ fn read_raw_bytes_from_stdin_async() -> Result<Vec<u8>, String> {
 
     println!("This is a work in progress minimal example to read the stdin asynchronously");
 
-    something()
-        .map_err(|e|e.to_string())
-        .map(|_| vec![])
-//    Err("in progress".to_string())
+    something().map_err(|e| e.to_string()).map(|_| vec![])
+    //    Err("in progress".to_string())
 }
 
 #[test]

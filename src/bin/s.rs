@@ -1,5 +1,7 @@
-use futures::stream::{once, Stream};
+use std::env;
 use std::time::Duration;
+
+use futures::stream::{once, Stream};
 use tokio_stdin::spawn_stdin_stream_unbounded;
 use tokio_timer::{Timer, TimerError};
 
@@ -37,7 +39,7 @@ fn main() -> Result<(), String> {
             Ok(Event::Byte(b)) => {
                 buffer.push(b);
                 n_bytes += 1
-            },
+            }
             Ok(Event::Second) => {
                 n_seconds += 1;
                 println!("{} bytes in {} seconds", n_bytes, n_seconds);
@@ -45,9 +47,12 @@ fn main() -> Result<(), String> {
             Ok(Event::Done) => {
                 println!("{} bytes in {} seconds", n_bytes, n_seconds);
                 println!("done!");
-//                buffer.reverse();
-                out(&buffer);
-                return Ok(());
+
+                if let Some(name) = env::args().nth(1) {
+                    return out(&buffer, &name);
+                } else {
+                    return Err("One command line arg (filename) is required.".to_string());
+                }
             }
             Err(e) => eprintln!("error {:?}", e),
         }
@@ -56,17 +61,19 @@ fn main() -> Result<(), String> {
     Err("Out of loop event.".to_string())
 }
 
-fn out(buffer: &[u8]) -> Result<(), String> {
+fn out(buffer: &[u8], name: &str) -> Result<(), String> {
     println!("  | Writing output ...");
     image::load_from_memory(&buffer)
         .map_err(|err| {
-            println!("errored, {}", err.to_string());
+            println!("error while loading image, {}", err.to_string());
             err.to_string()
         })
         .and_then(|image| {
             println!("    | Image loaded, preparing write.");
-            let res = image.save("out.jpg")
-                .map_err(|err| err.to_string());
+            let res = image.save(name).map_err(|err| {
+                println!("error while writing file.");
+                err.to_string()
+            });
 
             println!("    | Completed writing result.");
             res
