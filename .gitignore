@@ -2,3 +2,12 @@
 **/*.rs.bk
 .idea/
 *.iml
+
+!in1.jpg
+!in2.bmp
+!in3.bmp
+
+*.jpg
+*.bmp
+*.png
+*.ppm
